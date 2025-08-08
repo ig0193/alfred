@@ -1,4 +1,5 @@
 import os
+import re
 from typing import Optional
 from dotenv import load_dotenv
 
@@ -19,8 +20,10 @@ class LLMClient:
             self.provider = provider or os.getenv("LLM_PROVIDER", "mock")
             self.openai_key = os.getenv("OPENAI_API_KEY")
             self.anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+            self.gemini_key = os.getenv("GEMINI_API_KEY")
             self._openai_client = None
             self._anthropic_client = None
+            self._gemini_client = None
             self.__class__._initialized = True
     
     def generate_response(self, prompt: str) -> str:
@@ -28,6 +31,8 @@ class LLMClient:
             return self._openai_generate(prompt)
         elif self.provider == "anthropic" and self.anthropic_key:
             return self._anthropic_generate(prompt)
+        elif self.provider == "gemini" and self.gemini_key:
+            return self._gemini_generate(prompt)
         else:
             return self._mock_generate(prompt)
     
@@ -61,6 +66,21 @@ class LLMClient:
             return response.content[0].text
         except Exception as e:
             print(f"Anthropic API error: {e}")
+            return self._mock_generate(prompt)
+    
+    def _gemini_generate(self, prompt: str) -> str:
+        try:
+            if self._gemini_client is None:
+                import google.generativeai as genai
+                genai.configure(api_key=self.gemini_key)
+                self._gemini_client = genai.GenerativeModel('gemini-1.5-flash')
+            
+            response = self._gemini_client.generate_content(prompt)
+            print("Gem Response: ")
+            print(response)
+            return response.text
+        except Exception as e:
+            print(f"Gemini API error: {e}")
             return self._mock_generate(prompt)
     
     @classmethod
