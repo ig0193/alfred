@@ -14,7 +14,7 @@ def gmail_draft_node(state: Dict[str, Any]) -> Dict[str, Any]:
     context_text = "\n".join(agent_state.retrieved_context or [])
     
     prompt = f"""
-You are a professional customer support representative. Generate a polite, formal email reply.
+You are a software developer. Generate a polite, concise, formal email reply.
 
 ORIGINAL MESSAGE:
 From: {message.sender}
@@ -26,10 +26,8 @@ RELEVANT CONTEXT:
 
 Instructions:
 - Be professional and empathetic
-- Address the customer's concerns directly  
 - Use the context information to provide accurate details
 - Keep the tone formal but friendly
-- End with an offer for further assistance
 - Do not include email headers (To:, From:, Subject:)
 
 Generate only the email body:
